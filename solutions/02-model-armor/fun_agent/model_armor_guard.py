@@ -1,13 +1,14 @@
 import os
+import logging
 from typing import Optional
 
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models.llm_request import LlmRequest
 from google.adk.models.llm_response import LlmResponse
 from google.genai import types
-from google.cloud import modelarmor_v1
-from google.api_core.client_options import ClientOptions
 import agent.settings as settings
+
+logger = logging.getLogger(__name__)
 
 
 class ModelArmorGuard:
@@ -15,10 +16,18 @@ class ModelArmorGuard:
         self.template_name = template_name
         self.location = location
         self.block_on_match = block_on_match
-        self.client = modelarmor_v1.ModelArmorClient(
-            transport="rest",
-            client_options=ClientOptions(api_endpoint=f"modelarmor.{location}.rep.googleapis.com"),
-        )
+        self._client = None
+
+    @property
+    def client(self):
+        if self._client is None:
+            from google.cloud import modelarmor_v1
+            from google.api_core.client_options import ClientOptions
+            self._client = modelarmor_v1.ModelArmorClient(
+                transport="rest",
+                client_options=ClientOptions(api_endpoint=f"modelarmor.{self.location}.rep.googleapis.com"),
+            )
+        return self._client
 
     def _get_matched_filters(self, result) -> list[str]:
         matched_filters = []
@@ -82,6 +91,7 @@ class ModelArmorGuard:
         if not user_text:
             return None
         try:
+            from google.cloud import modelarmor_v1
             sanitize_request = modelarmor_v1.SanitizeUserPromptRequest(
                 name=self.template_name,
                 user_prompt_data=modelarmor_v1.DataItem(text=user_text),
@@ -98,8 +108,8 @@ class ModelArmorGuard:
                 else:
                     message = "I apologize, but I cannot process this request due to security concerns. Please rephrase your question."
                 return LlmResponse(content=types.Content(role="model", parts=[types.Part.from_text(text=message)]))
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"ModelArmor check failed, allowing through: {e}")
         return None
 
     async def after_model_callback(self, callback_context: CallbackContext, llm_response: LlmResponse) -> Optional[LlmResponse]:
@@ -107,6 +117,7 @@ class ModelArmorGuard:
         if not model_text:
             return None
         try:
+            from google.cloud import modelarmor_v1
             sanitize_request = modelarmor_v1.SanitizeModelResponseRequest(
                 name=self.template_name,
                 model_response_data=modelarmor_v1.DataItem(text=model_text),
@@ -116,8 +127,8 @@ class ModelArmorGuard:
             if matched_filters and self.block_on_match:
                 message = "I apologize, but my response was filtered for security reasons. Could you please rephrase your question?"
                 return LlmResponse(content=types.Content(role="model", parts=[types.Part.from_text(text=message)]))
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"ModelArmor check failed, allowing through: {e}")
         return None
 
 
