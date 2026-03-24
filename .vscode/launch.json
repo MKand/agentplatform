@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Deploy Solution 04",
+            "type": "python",
+            "request": "launch",
+            "module": "solutions.04-mcp-server.deploy",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Deploy Solution 03",
+            "type": "python",
+            "request": "launch",
+            "module": "solutions.03-deploy.deploy",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
