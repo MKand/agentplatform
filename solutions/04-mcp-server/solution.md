@@ -53,6 +53,12 @@ def get_bearer_token(audience: str) -> str:
 
 ### 1. Deploy MCP Server to Cloud Run
 
+First, authenticate:
+```bash
+gcloud auth login
+gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
+```
+
 **With Authentication (recommended for production):**
 ```bash
 gcloud run deploy fun-fact-mcp-server \
