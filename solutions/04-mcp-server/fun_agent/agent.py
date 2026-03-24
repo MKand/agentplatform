@@ -12,10 +12,11 @@ model_armor_guard = create_model_armor_guard(
     location=settings.LOCATION
 )
 
+token = get_bearer_token(settings.FUN_FACT_MCP_URL)
 fun_fact_mcp_tool = MCPToolset(
     connection_params=StreamableHTTPConnectionParams(
         url=settings.FUN_FACT_MCP_URL,
-        headers={"Authorization": f"Bearer {get_bearer_token(settings.FUN_FACT_MCP_URL)}"},
+        headers={"Authorization": f"Bearer {token}"} if token else {},
     )
 )
 
