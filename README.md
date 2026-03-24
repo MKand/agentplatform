@@ -21,9 +21,11 @@ gcloud auth application-default login
 ## Challenges
 
 ### Challenge 1: Simple Agent
+
 Create a greeting agent using the ADK.
 
 **What you need to do:**
+
 - Initialize an ADK Agent
 - Choose and configure a model
 - Add a greeting instruction
@@ -34,9 +36,11 @@ Create a greeting agent using the ADK.
 ---
 
 ### Challenge 2: Model Armor Security
+
 Add security guardrails to detect prompt injection and sensitive data.
 
 **What you need to do:**
+
 - Create a Model Armor template via the Google Cloud Console or API
 - Create callback functions that intercept LLM requests/responses
 - Integrate the callbacks with your agent
@@ -47,24 +51,26 @@ Add security guardrails to detect prompt injection and sensitive data.
 ---
 
 ### Challenge 3: Deploy to Agent Engine
+
 Deploy your agent as a cloud-hosted web service with observability.
 
 **What you need to do:**
-- Enable Agent Engine API in your project
-- Configure telemetry (Cloud Monitoring)
-- Set up agent identity for service accounts
-- Create and run the deployment script
+
+- Deploy your agent to agent_engine.
+- Enable telemetry
 
 **Verify:** Agent is accessible via the Agent Engine endpoint.
 
 ---
 
 ### Challenge 4: MCP Tool Integration
+
 Add an MCP server to extend your agent's capabilities.
 
 **What you need to do:**
+
 - Create a simple MCP server with at least one tool
-- Deploy the MCP server to Cloud Run
+- Deploy the MCP server to Cloud Run (optionally: the service should require authentication)
 - Integrate the MCP server as a tool in your agent
 - Ensure authentication works between agent and MCP server
 
