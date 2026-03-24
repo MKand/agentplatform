@@ -1,6 +1,5 @@
-import os
 from google.adk import Agent
-import agent.settings as settings
+import fun_agent.settings as settings
 
 
 simple_agent = Agent(

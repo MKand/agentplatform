@@ -1,7 +1,6 @@
-import os
 from google.adk import Agent
-import agent.settings as settings
-from agent.model_armor_guard import create_model_armor_guard
+import fun_agent.settings as settings
+from fun_agent.model_armor_guard import create_model_armor_guard
 
 
 model_armor_guard = create_model_armor_guard(
