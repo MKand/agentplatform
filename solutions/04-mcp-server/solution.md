@@ -69,7 +69,8 @@ Note the resulting URL: `https://fun-fact-mcp-server-xxxx-uc.a.run.app`
 
 ```bash
 export FUN_FACT_MCP_URL=https://fun-fact-mcp-server-xxxx-uc.a.run.app
-python deploy.py
+chmod +x deploy.sh
+./deploy.sh
 ```
 
 ## How MCP Works

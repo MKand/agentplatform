@@ -6,42 +6,42 @@ Cloud deployment with observability and identity management.
 
 ## New Files
 
-### `deploy.py`
+### `deploy.sh`
 
-Deployment script using Vertex AI Agent Engine:
+Deployment script using the ADK CLI:
 
-```python
-import vertexai
-from vertexai import agent_engines
+```bash
+#!/bin/bash
+set -e
 
-vertexai.init(project=settings.PROJECT_ID, location=settings.LOCATION)
+STAGING_BUCKET="gs://$GOOGLE_CLOUD_PROJECT-ae-staging-bucket"
 
-remote_agent = agent_engines.create(
-    source_packages=["./fun_agent"],
-    entrypoint_module="fun_agent.agent",
-    entrypoint_object="root_agent",
-    requirements_file="requirements.txt",
-    identity_type="SERVICE_ACCOUNT",
-    env_vars=env_vars,
-    agent_framework="ADK",
-)
+echo "Creating staging bucket if it doesn't exist..."
+gcloud storage buckets create "$STAGING_BUCKET" --project="$GOOGLE_CLOUD_PROJECT" --location="$GOOGLE_CLOUD_LOCATION" 2>/dev/null || echo "Bucket already exists"
+
+echo "Deploying agent to Agent Engine..."
+adk deploy agent_engine fun_agent \
+    --project="$GOOGLE_CLOUD_PROJECT" \
+    --region="$GOOGLE_CLOUD_LOCATION" \
+    --display_name="Fun Agent" \
+    --staging_bucket="$STAGING_BUCKET" \
+    --trace_to_cloud \
+    --env_file="fun_agent/.env"
 ```
 
 ## Key Configuration
 
-### Environment Variables
-```python
-env_vars = {
-    "GOOGLE_GENAI_USE_VERTEXAI": "TRUE",
-    "GOOGLE_CLOUD_PROJECT": settings.PROJECT_ID,
-    "GOOGLE_CLOUD_LOCATION": settings.LOCATION,
-    "TEMPLATE_NAME": settings.TEMPLATE_NAME,
-}
+### Environment Variables (`.env` file)
+```
+GOOGLE_GENAI_USE_VERTEXAI=TRUE
+GOOGLE_CLOUD_PROJECT=your-project-id
+GOOGLE_CLOUD_LOCATION=us-central1
+TEMPLATE_NAME=your-template-name
 ```
 
-### Identity Type
-- `SERVICE_ACCOUNT`: Uses a dedicated service account for API access
-- Enables proper IAM permissions for Model Armor and other GCP services
+### Flags
+- `--trace_to_cloud`: Enables Cloud Trace for observability
+- `--env_file`: Loads environment variables from file
 
 ## Prerequisites
 
@@ -60,7 +60,8 @@ env_vars = {
 ## Deployment
 
 ```bash
-python deploy.py
+chmod +x deploy.sh
+./deploy.sh
 ```
 
 The command returns an agent resource name you can use to interact with the deployed agent.
