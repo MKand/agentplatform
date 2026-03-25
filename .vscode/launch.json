@@ -3,19 +3,29 @@
     "configurations": [
         {
             "name": "Deploy Solution 04",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
-            "module": "solutions.04-mcp-server.deploy",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
+            "module": "deploy",
+            "cwd": "${workspaceFolder}/solutions/04-mcp-server",
+            "python": "${workspaceFolder}/.venv/bin/python3",
+            "justMyCode": false,
+            "env": {
+                "GOOGLE_CLOUD_PROJECT": "n26-learn-c2c-app-dev-1",
+                "GOOGLE_CLOUD_LOCATION": "us-central1"
+            }
         },
         {
             "name": "Deploy Solution 03",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
-            "module": "solutions.03-deploy.deploy",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
+            "module": "deploy",
+            "cwd": "${workspaceFolder}/solutions/03-deploy",
+            "python": "${workspaceFolder}/.venv/bin/python3",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/solutions/03-deploy",
+                "GOOGLE_CLOUD_PROJECT": "n26-learn-c2c-app-dev-1",
+                "GOOGLE_CLOUD_LOCATION": "us-central1"
+            }
         }
     ]
 }

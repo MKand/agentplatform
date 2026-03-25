@@ -49,6 +49,40 @@ def get_bearer_token(audience: str) -> str:
     return google.oauth2.id_token.fetch_id_token(request, audience)
 ```
 
+## Deployment Method: Source Files
+
+This solution uses **source file deployment** - deploying from source code instead of passing the agent object:
+
+```python
+remote_agent = client.agent_engines.create(
+    config={
+        "source_packages": ["./fun_agent"],
+        "entrypoint_module": "fun_agent.agent",
+        "entrypoint_object": "root_agent",
+        "class_methods": [...],
+    }
+)
+```
+
+### Why Source Deployment?
+
+**Agent object deployment (Challenge 3) uses pickle serialization**, which fails when the agent contains non-picklable objects. The `MCPToolset` contains:
+- Stream connections that can't be serialized
+- HTTP client objects
+- File handles or logging handlers
+
+**Source deployment** avoids this by:
+1. Uploading source code as a `.tar.gz` archive
+2. Agent Engine installs dependencies and runs the code directly
+3. No pickle serialization needed
+
+### When to Use This Method
+
+- Agents with complex objects (MCP tools, database connections, etc.)
+- Production deployments
+- CI/CD pipelines
+- When you need reproducible builds
+
 ## Deployment Steps
 
 ### 1. Deploy MCP Server to Cloud Run
@@ -62,11 +96,11 @@ gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
 **With Authentication (recommended for production):**
 ```bash
 gcloud run deploy fun-fact-mcp-server \
-  --project=$PROJECT_ID \
+  --project=$GOOGLE_CLOUD_PROJECT \
   --region=$LOCATION \
   --memory=1Gi \
   --no-allow-unauthenticated \
-  --set-env-vars=GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
+  --set-env-vars=GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT \
   --source fun-fact-mcp-server
 ```
 
@@ -83,12 +117,20 @@ gcloud run deploy fun-fact-mcp-server \
 
 Note the resulting URL: `https://fun-fact-mcp-server-xxxx-uc.a.run.app`
 
-### 2. Deploy Agent
+### 2. Update Environment Variables
+
+Update `fun_agent/.env` with your MCP server URL:
+```bash
+FUN_FACT_MCP_URL=https://fun-fact-mcp-server-xxxx-uc.a.run.app
+```
+
+### 3. Deploy Agent
+
+Run the deployment script:
 
 ```bash
-export FUN_FACT_MCP_URL=https://fun-fact-mcp-server-xxxx-uc.a.run.app
-chmod +x deploy.sh
-./deploy.sh
+cd solutions/04-mcp-server
+python3 deploy.py
 ```
 
 ## How MCP Works
