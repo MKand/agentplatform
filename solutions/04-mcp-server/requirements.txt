@@ -1,3 +1,0 @@
-google-adk[a2a]==1.18.0
-google-cloud-modelarmor
-google-cloud-aiplatform>=1.55.0

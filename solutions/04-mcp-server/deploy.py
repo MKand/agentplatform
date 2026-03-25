@@ -22,7 +22,7 @@ def deploy_agent():
             "source_packages": ["./fun_agent"],
             "entrypoint_module": "fun_agent.agent",
             "entrypoint_object": "root_agent",
-            "requirements_file": "./requirements.txt",
+            "requirements_file": "requirements.txt",
             "class_methods": [
                 {
                     "name": "query",
