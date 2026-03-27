@@ -19,7 +19,7 @@ def deploy_agent():
         config={
             "display_name": "Fun agent with Facts",
             "description": "An agent deployed from source files with MCP tools",
-            "source_packages": ["./fun_agent"],
+            "source_packages": ["fun_agent"],
             "entrypoint_module": "fun_agent.agent",
             "entrypoint_object": "root_agent",
             "requirements_file": "requirements.txt",

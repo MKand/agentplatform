@@ -6,10 +6,11 @@ from google.adk.agents.callback_context import CallbackContext
 from google.adk.models.llm_request import LlmRequest
 from google.adk.models.llm_response import LlmResponse
 from google.genai import types
-import fun_agent.settings as settings
+from fun_agent.config import configs
+from google.cloud import modelarmor_v1
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 class ModelArmorGuard:
     def __init__(self, template_name: str, location: str = "us-central1", block_on_match: bool = True):
@@ -91,10 +92,11 @@ class ModelArmorGuard:
         if not user_text:
             return None
         try:
-            from google.cloud import modelarmor_v1
+            user_prompt_data = modelarmor_v1.DataItem(text=user_text)
+            print(self.template_name)
             sanitize_request = modelarmor_v1.SanitizeUserPromptRequest(
                 name=self.template_name,
-                user_prompt_data=modelarmor_v1.DataItem(text=user_text),
+                user_prompt_data=user_prompt_data,
             )
             result = self.client.sanitize_user_prompt(request=sanitize_request)
             matched_filters = self._get_matched_filters(result)
@@ -109,7 +111,7 @@ class ModelArmorGuard:
                     message = "I apologize, but I cannot process this request due to security concerns. Please rephrase your question."
                 return LlmResponse(content=types.Content(role="model", parts=[types.Part.from_text(text=message)]))
         except Exception as e:
-            logger.warning(f"ModelArmor check failed, allowing through: {e}")
+            logger.warning(f"Pre-ModelArmor check failed, allowing through: {e}")
         return None
 
     async def after_model_callback(self, callback_context: CallbackContext, llm_response: LlmResponse) -> Optional[LlmResponse]:
@@ -117,7 +119,6 @@ class ModelArmorGuard:
         if not model_text:
             return None
         try:
-            from google.cloud import modelarmor_v1
             sanitize_request = modelarmor_v1.SanitizeModelResponseRequest(
                 name=self.template_name,
                 model_response_data=modelarmor_v1.DataItem(text=model_text),
@@ -128,13 +129,13 @@ class ModelArmorGuard:
                 message = "I apologize, but my response was filtered for security reasons. Could you please rephrase your question?"
                 return LlmResponse(content=types.Content(role="model", parts=[types.Part.from_text(text=message)]))
         except Exception as e:
-            logger.warning(f"ModelArmor check failed, allowing through: {e}")
+            logger.warning(f"Post-ModelArmor check failed, allowing through: {e}")
         return None
 
 
 def create_model_armor_guard(project_id: str = None, location: str = None, template_name: str = None) -> ModelArmorGuard:
-    location = location or settings.LOCATION
-    template_name = template_name or settings.FULL_TEMPLATE_NAME
+    location = location or configs.location
+    template_name = template_name or configs.model_armor_template_name
     if not template_name:
         raise ValueError("TEMPLATE_NAME not set. Create a Model Armor template first.")
     return ModelArmorGuard(template_name=template_name, location=location, block_on_match=True)

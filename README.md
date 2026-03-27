@@ -33,6 +33,11 @@ Create a greeting agent using the ADK.
 
 **Verify:** `adk web` starts and the agent responds to greetings.
 
+**Documentation**
+
+- [ADK Documentation](https://google.github.io/adk-docs/)
+- [ADK Quickstart](https://google.github.io/adk-docs/get-started/python/)
+
 ---
 
 ### Challenge 2: Model Armor Security
@@ -48,6 +53,11 @@ Add security guardrails to detect prompt injection and sensitive data.
 
 **Verify:** Attack prompts are blocked with appropriate messages.
 
+**Documentation**
+
+- [Model Armor Creating templates](https://docs.cloud.google.com/model-armor/manage-templates)
+- [Using Model Armor templates to sanitize user prompts](https://docs.cloud.google.com/model-armor/sanitize-prompts-responses#python)
+
 ---
 
 ### Challenge 3: Deploy to Agent Engine
@@ -61,6 +71,10 @@ Deploy your agent as a cloud-hosted web service with observability.
 
 **Verify:** Agent is accessible via the Agent Engine endpoint.
 
+**Documentation**
+
+- [Deploying agents to Agent Engine](https://docs.cloud.google.com/agent-builder/agent-engine/deploy)
+
 ---
 
 ### Challenge 4: MCP Tool Integration
@@ -71,10 +85,15 @@ Add an MCP server to extend your agent's capabilities.
 
 - Create a simple MCP server with at least one tool
 - Deploy the MCP server to Cloud Run (optionally: the service should require authentication)
-- Integrate the MCP server as a tool in your agent
+- Integrate the MCP server as a tool in your agent (optionally use the API Registry for MCP discovery)
 - Ensure authentication works between agent and MCP server
 
 **Verify:** Agent can call the MCP tool and return results.
+
+**Documentation**
+
+- [ADK Mcptoolset](https://google.github.io/adk-docs/tools/mcp-toolset)
+- [API Registry](https://google.github.io/adk-docs/integrations/api-registry/)
 
 ---
 
